@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 
 {% block content %}
+<a class="btn btn-secondary" href="/add_job">Добавить работу</a>
 {% for job in jobs %}
     <div class="mb-3 job">
     <h3>Action #{{ job.id }}</h3>
@@ -28,6 +29,10 @@
         </tbody>
     </table>
     </div>
+    {% if job in editable_jobs %}
+        <a class="btn btn-warning" href="/change_job/{{job.id}}">Изменить</a>
+        <a class="btn btn-danger" href="/delete_job/{{job.id}}">Удалить</a>
+    {% endif %}
 {% endfor %}
 
 {% endblock %}
