@@ -1,8 +1,10 @@
 from flask import render_template, redirect, Flask, request
 from flask_login import LoginManager, login_user, current_user
 from data import db_session
+from data.departments import Department
 from data.users import User
 from data.jobs import Job
+from forms.add_department import DepartAdditionForm
 from forms.add_job import JobAdditionForm
 from forms.user_forms import LoginForm, RegisterForm
 
@@ -22,6 +24,19 @@ def work_log():
     else:
         editable_jobs = []
     return render_template('jobs_list.html', jobs=jobs, current_user=current_user, editable_jobs=editable_jobs)
+
+
+@app.route('/departments_log')
+def departments_log():
+    db_sess = db_session.create_session()
+    departs = db_sess.query(Department).all()
+    if current_user.is_authenticated:
+        editable_departs = db_sess.query(Department).filter((Department.chief == current_user.id)
+                                                            | (current_user.id == 1))
+    else:
+        editable_departs = []
+    return render_template('departments_list.html', departs=departs, current_user=current_user,
+                           editable_departs=editable_departs)
 
 
 @app.route("/register", methods=['GET', 'POST'])
@@ -162,6 +177,68 @@ def delete_job(id):
         return redirect('/works_log')
     return render_template('add_job.html', title='Удаление работ',
                            form=form)
+
+
+@app.route('/add_depart', methods=['GET', 'POST'])
+def add_depart():
+    form = DepartAdditionForm()
+    if not current_user.is_authenticated:
+        return render_template('add_department.html', title='Добавление департаментов',
+                               form=form,
+                               message="Авторизируйтесь чтобы добавить департамент")
+    if form.validate_on_submit():
+        db_sess = db_session.create_session()
+        depart = Department(
+            title=form.title.data,
+            chief=form.chief.data,
+            members=form.members.data,
+            email=form.email.data,
+        )
+        db_sess.add(depart)
+        db_sess.commit()
+        return redirect('/departments_log')
+    return render_template('add_department.html', title='Добавление департаментов', form=form)
+
+
+@app.route('/change_depart/<id>', methods=['GET', 'POST'])
+def change_depart(id):
+    form = DepartAdditionForm()
+    db_sess = db_session.create_session()
+    selected_depart = db_sess.query(Department).filter(Department.id == id).first()
+    if request.method == 'GET':
+        form.title.data = selected_depart.title
+        form.chief.data = selected_depart.chief
+        form.members.data = selected_depart.members
+        form.email.data = selected_depart.email
+
+    if form.validate_on_submit():
+        if not current_user.is_authenticated:
+            return render_template('add_department.html',
+                                   title='Добавление работ',
+                                   form=form,
+                                   message="Авторизируйтесь чтобы изменить департамент")
+        if current_user.id != selected_depart.chief and current_user.id != 1:
+            return render_template('add_department.html',
+                                   title='Добавление работ',
+                                   form=form,
+                                   message="Недостаточно прав")
+        db_sess = db_session.create_session()
+        selected_depart = db_sess.query(Department).filter(Department.id == id).first()
+        selected_depart.title = form.title.data
+        selected_depart.chief = form.chief.data
+        selected_depart.members = form.members.data
+        selected_depart.email = form.email.data
+        db_sess.commit()
+        return redirect('/departments_log')
+    return render_template('add_department.html', title='Добавление департаментов',
+                           form=form)
+
+@app.route('/delete_depart/<id>')
+def delete_depart(id):
+    db_sess = db_session.create_session()
+    db_sess.query(Department).filter(Department.id == id).delete()
+    db_sess.commit()
+    return redirect('/departments_log')
 
 
 if __name__ == '__main__':

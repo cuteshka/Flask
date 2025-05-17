@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h3>Departments log</h3>
+<a class="btn btn-secondary" href="/add_depart">Добавить департамент</a>
+<a class="btn btn-light" href="/works_log">Перейти к работам</a>
+{% for depart in departs %}
+    <table border="1" align="center">
+        <h5>Department #{{depart.id}}</h5>
+        <tr bgcolor="lightgray">
+            <td width="225px"><p>Title of department<p></td>
+            <td width="175px"><p>Chief<p></td>
+            <td width="125px"><p>Members<p></td>
+            <td width="175px"><p>Department Email<p></td>
+        </tr>
+        <tr bgcolor="lightblue">
+            <td><p>{{depart.title}}<p></td>
+            <td><p>{{depart.chief_obj.surname}} {{depart.chief_obj.name}}<p></td>
+            <td><p>{{depart.members}}<p></td>
+            <td><p>{{depart.email}}<p></td>
+        </tr>
+    </table>
+    {% if depart in editable_departs %}
+        <a class="btn btn-warning" href="/change_depart/{{depart.id}}">Изменить</a>
+        <a class="btn btn-danger" href="/delete_depart/{{depart.id}}">Удалить</a>
+    {% endif %}
+{% endfor %}
+
+{% endblock %}
