@@ -4,6 +4,7 @@ from data import db_session
 from data.departments import Department
 from data.users import User
 from data.jobs import Job
+from data.category import Category
 from forms.add_department import DepartAdditionForm
 from forms.add_job import JobAdditionForm
 from forms.user_forms import LoginForm, RegisterForm
@@ -109,6 +110,8 @@ def add_job():
             collaborators=form.collaborators.data,
             is_finished=form.is_finished.data,
         )
+        for category in form.categories.data.split(','):
+            job.categories.append(db_sess.query(Category).filter(Category.id == category).first())
         db_sess.add(job)
         db_sess.commit()
         return redirect('/works_log')

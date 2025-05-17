@@ -9,7 +9,7 @@
         <thead class="table-secondary">
             <tr>
                 {% for header in ["Title of activity", "Team leader", "Duration",
-                "List of collaborators", "Is finished"] %}
+                "List of collaborators",  "Hazard category", "Is finished"] %}
                     <th scope="col" class="col-md-auto">{{ header }}</th>
                 {% endfor %}
             </tr>
@@ -20,6 +20,11 @@
                 <td class="table-primary">{{ job.leader.name}} {{job.leader.surname}}</td>
                 <td class="table-primary">{{ job.work_size }} Hours</td>
                 <td class="table-primary">{{ job.collaborators }}</td>
+                <td class="table-primary"><p>
+                {% for category in job.categories %}
+                    {{category.id}}
+                {% endfor %}
+                <p></td>
                 {% if job.is_finished %}
                     <td class="table-success">Finished</td>
                 {% else %}
