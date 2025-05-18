@@ -3,8 +3,6 @@ from requests import post, get
 # без параметров
 print(post('http://localhost:8080/api/jobs', json={}).json())
 
-
-
 # верный запрос
 print(post('http://localhost:8080/api/jobs',
            json={'team_leader': 1,
@@ -25,4 +23,3 @@ print(post('http://localhost:8080/api/jobs',
                  'collaborators': '1, 2',
                  'is_finished': False,
                  'categories': '2'}).json())
-

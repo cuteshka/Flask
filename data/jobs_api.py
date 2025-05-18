@@ -96,3 +96,31 @@ def add_job():
     db_sess.add(job)
     db_sess.commit()
     return jsonify({'id': job.id})
+
+
+@blueprint.route('/api/jobs/<int:job_id>', methods=['DELETE'])
+def delete_job(job_id):
+    db_sess = db_session.create_session()
+    job = db_sess.query(Job).get(job_id)
+    if not job:
+        return make_response(jsonify({'error': 'Not found'}), 404)
+    db_sess.delete(job)
+    db_sess.commit()
+    return jsonify({'success': 'OK'})
+
+
+@blueprint.route('/api/jobs/<int:job_id>', methods=['PUT'])
+def change_job(job_id):
+    req_json = request.json
+    db_sess = db_session.create_session()
+    job = db_sess.query(Job).filter(Job.id == job_id).first()
+    if not job:
+        return make_response(jsonify({'error': 'Not found'}), 404)
+    job.team_leader = req_json.get('team_leader', job.team_leader)
+    job.job = req_json.get('job', job.job)
+    job.work_size = req_json.get('work_size', job.work_size)
+    job.collaborators = req_json.get('collaborators', job.collaborators)
+    job.is_finished = req_json.get('is_finished', job.is_finished)
+    db_sess.add(job)
+    db_sess.commit()
+    return jsonify({'success': 'OK'})
