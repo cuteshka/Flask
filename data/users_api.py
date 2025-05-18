@@ -28,8 +28,9 @@ def get_users():
                         'position',
                         'speciality',
                         'address',
+                        'city_from',
                         'email',
-                        'modified_date',
+                        'modified_date'
                     )
                 )
                     for item in users]
@@ -56,8 +57,9 @@ def get_user(user_id):
                             'position',
                             'speciality',
                             'address',
+                            'city_from',
                             'email',
-                            'modified_date',
+                            'modified_date'
                         )
                     )
                 ]
@@ -72,7 +74,7 @@ def add_users():
         return make_response(jsonify({'error': 'Empty request'}), 400)
     elif not all(key in req_json for key in
                  ['surname', 'name', 'age', 'position',
-                  'speciality', 'address', 'email']):
+                  'speciality', 'address', 'city_from', 'email']):
         return make_response(jsonify({'error': 'Bad request'}), 400)
     try:
         db_sess = db_session.create_session()
@@ -83,6 +85,7 @@ def add_users():
             position=req_json['position'],
             speciality=req_json['speciality'],
             address=req_json['address'],
+            city_from=req_json['city_from'],
             email=req_json['email']
         )
         db_sess.add(user)
@@ -106,6 +109,7 @@ def put_user(user_id):
     user.speciality = req_json.get('speciality', user.speciality)
     user.address = req_json.get('address', user.address)
     user.email = req_json.get('email', user.email)
+    user.city_from = req_json.get('city_from', user.city_from)
     user.modified_date = datetime.datetime.now()
 
     db_sess.add(user)

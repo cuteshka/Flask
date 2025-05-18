@@ -15,15 +15,16 @@ from requests import get, post, delete
 # # без параметров
 # print(post('http://localhost:8080/api/users', json={}).json())
 #
-# # верный запрос
-# print(post('http://localhost:8080/api/users',
-#            json={'surname': "L",
-#                  'name': 'l',
-#                  'age': 17,
-#                  'position': 'developer',
-#                  'speciality': 'no',
-#                  'address': 'module',
-#                  'email': 'fgh@fgg.tt'}).json())
+# верный запрос
+print(post('http://localhost:8080/api/users',
+           json={'surname': "L",
+                 'name': 'l',
+                 'age': 17,
+                 'position': 'developer',
+                 'speciality': 'no',
+                 'address': 'module',
+                 'city_from': 'Moscow',
+                 'email': 'fgh@fgg.tt'}).json())
 
 # мало параметров
 # print(post('http://localhost:8080/api/users',

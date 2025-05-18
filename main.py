@@ -1,13 +1,15 @@
-from flask import render_template, redirect, Flask, request, make_response, jsonify
+from flask import render_template, redirect, Flask, request, make_response, jsonify, url_for
 from flask_login import LoginManager, login_user, current_user
 from data import db_session, jobs_api, users_api
 from data.departments import Department
+from data.map import get_city_map
 from data.users import User
 from data.jobs import Job
 from data.category import Category
 from forms.add_department import DepartAdditionForm
 from forms.add_job import JobAdditionForm
 from forms.user_forms import LoginForm, RegisterForm
+from requests import get
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
@@ -236,6 +238,7 @@ def change_depart(id):
     return render_template('add_department.html', title='Добавление департаментов',
                            form=form)
 
+
 @app.route('/delete_depart/<id>')
 def delete_depart(id):
     db_sess = db_session.create_session()
@@ -252,6 +255,22 @@ def not_found(error):
 @app.errorhandler(400)
 def bad_request(_):
     return make_response(jsonify({'error': 'Bad Request'}), 400)
+
+
+@app.route('/users_show/<int:user_id>')
+def users_show(user_id):
+    response = get(f'http://127.0.0.1:8080/api/users/{user_id}')
+    if not response:
+        return "User is not found"
+    user = response.json()['users'][0]
+    city = user['city_from']
+    name = user['name']
+    city_img = get_city_map(city)
+    with open('static/img/city.png', "wb") as file:
+        file.write(city_img)
+    url = url_for('static', filename='img/city.png')
+    return render_template('show_map.html', city=city, name=name, url=url)
+
 
 if __name__ == '__main__':
     db_session.global_init("db/mars.db")
